@@ -15,4 +15,13 @@ for cluster in docs.keys():
         maximum_terms += len(docs[cluster][document])
 print(maximum_terms)
 print(len(space))
+
+print(len(docs))
+for cluster in docs.keys():
+    print(len(docs[cluster]))
+
+print(len(vect_docs))
+for cluster in vect_docs.keys():
+    print(len(vect_docs[cluster]))
+
 import ipdb;ipdb.set_trace()
