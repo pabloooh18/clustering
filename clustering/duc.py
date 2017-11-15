@@ -3,7 +3,11 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from string import punctuation
 
+import numpy as np
+import pickle
+
 import os
+import json
 
 from processing import *
 
@@ -70,3 +74,20 @@ def get_cluster_centroids(vectorized_documents):
                                             )
                                 )
     return centroids
+
+def jsonify(dictionary):
+    if isinstance(dictionary, np.ndarray) or\
+       isinstance(dictionary, set):
+        return list(dictionary)
+    elif isinstance(dictionary, dict):
+        for key in dictionary.keys():
+            dictionary[key] = jsonify(dictionary[key])
+    return dictionary
+
+def dump(dictionary, output_path):
+    with open(output_path, "w") as out:
+        out.write(json.dumps(jsonify(dictionary)))
+
+def pickle_dump(dictionary, output_path):
+    with open(output_path, "wb") as out:
+        pickle.dump(dictionary, out)
