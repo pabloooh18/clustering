@@ -39,7 +39,6 @@ def get_rouge_document_clusters(data_folder_original):
             original_text = root.find("TEXT").text
             token_set = get_rouge_tokens(original_text)
             documents[cluster][document] = token_set
-        break
     return documents
 
 
