@@ -106,3 +106,13 @@ def dump(dictionary, output_path):
 def pickle_dump(dictionary, output_path):
     with open(output_path, "wb") as out:
         pickle.dump(dictionary, out)
+
+def pickle_dumps(dictionary, output_path):
+    n_bytes = 2**12
+    max_bytes = 2**12 - 1
+    data = bytearray(n_bytes)
+
+    bytes_out = pickle.dumps(data)
+    with open(output_path, 'wb') as f_out:
+        for idx in range(0, n_bytes, max_bytes):
+            f_out.write(bytes_out[idx:idx+max_bytes])

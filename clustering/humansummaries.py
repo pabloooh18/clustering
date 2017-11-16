@@ -33,7 +33,7 @@ duc.pickle_dump(documents, output_folder_summ10 + p_documents_file)
 
 vectorized_documents = duc.convert_to_vectors(documents, space)
 duc.dump(vectorized_documents, output_folder_summ10 + out_vectorized_documents_file)
-duc.pickle_dump(vectorized_documents, output_folder_summ10 + p_vectorized_documents_file)
+duc.pickle_dumps(vectorized_documents, output_folder_summ10 + p_vectorized_documents_file)
 
 # Rouge summ100
 documents = duc.get_rouge_summary_clusters(data_folder_summ100)
