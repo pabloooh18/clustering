@@ -41,6 +41,22 @@ def get_rouge_document_clusters(data_folder_original):
             documents[cluster][document] = token_set
     return documents
 
+def get_rouge_summary_clusters(data_folder_original):
+    '''returns documents as rouge tokens, ordered by cluster'''
+    cluster_ids = os.listdir(data_folder_original)
+    documents = {}
+
+    # Gets the tokens
+    for cluster in cluster_ids:
+        cluster_folder = data_folder_original + "/" + cluster
+        documents[cluster] = {}
+        for document in os.listdir(cluster_folder):
+            document_path = cluster_folder + "/" + document
+            with open(document_path, "r") as fin:
+                original_text = fin.read()
+            token_set = get_rouge_tokens(original_text)
+            documents[cluster][document] = token_set
+    return documents
 
 def convert_to_vectors(documents, vector_space):
     # Calculates the representation

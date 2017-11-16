@@ -27,7 +27,7 @@ p_documents_file = "/rouge_docs.p"
 p_vectorized_documents_file = "/rouge_vect_docs.p"
 
 # Rouge summ10
-documents = duc.get_rouge_document_clusters(data_folder_summ10)
+documents = duc.get_rouge_summary_clusters(data_folder_summ10)
 duc.dump(documents, output_folder_summ10 + out_documents_file)
 duc.pickle_dump(documents, output_folder_summ10 + p_documents_file)
 
@@ -36,7 +36,7 @@ duc.dump(vectorized_documents, output_folder_summ10 + out_vectorized_documents_f
 duc.pickle_dump(vectorized_documents, output_folder_summ10 + p_vectorized_documents_file)
 
 # Rouge summ100
-documents = duc.get_rouge_document_clusters(data_folder_summ100)
+documents = duc.get_rouge_summary_clusters(data_folder_summ100)
 duc.dump(documents, output_folder_summ100 + out_documents_file)
 duc.pickle_dump(documents, output_folder_summ100 + p_documents_file)
 
