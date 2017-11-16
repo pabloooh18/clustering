@@ -4,13 +4,13 @@ from nltk.cluster import util
 
 import numpy as np
 
-with open("../res/rouge_docs.p", "rb") as fin:
+with open("../outputs/original/rouge_docs.p", "rb") as fin:
     docs = pickle.load(fin)
-with open("../res/rouge_vect_docs.p", "rb") as fin:
+with open("../outputs/original/rouge_vect_docs.p", "rb") as fin:
     vect_docs = pickle.load(fin)
-with open("../res/rouge_space.p", "rb") as fin:
+with open("../outputs/original/rouge_space.p", "rb") as fin:
     space = pickle.load(fin)
-with open("../res/rouge_centroids.p", "rb") as fin:
+with open("../outputs/original/rouge_centroids.p", "rb") as fin:
     ideal_centroids = pickle.load(fin)
 
 # get seed centroids
