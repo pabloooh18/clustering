@@ -34,6 +34,13 @@ def print_confusion_matrix(matrix):
             row += "\t" + str(matrix[i][j])
         print(row)
 
+def purity(predicted, observed):
+    matrix = confusion_matrix(predicted, observed)
+    max_values = []
+    for cls in matrix.keys():
+        max_values.append(max(matrix[cls].values()))
+    return sum(max_values)/len(observed)
+
 def true_positives(predicted, observed, cls):
     return np.sum(np.logical_and((predicted == cls), (observed == cls)))
 
@@ -75,6 +82,7 @@ def f1(predicted, observed, cls):
 # observed = np.array(("cat", "cat", "cat", "cat", "dog", "dog", "dog", "human", "human", "donkey"))
 # predicted = np.array(("dog", "cat", "cat", "dog", "donkey", "cat", "human", "human", "donkey", "dog"))
 # mat = confusion_matrix(predicted, observed)
+# print(purity(predicted, observed))
 # table = table_of_confusion(predicted, observed, "cat")
 # print_confusion_matrix(mat)
 # print_confusion_matrix(table)
