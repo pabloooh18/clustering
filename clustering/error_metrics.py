@@ -23,6 +23,14 @@ def confusion_matrix(predicted, observed):
                                       )
     return matrix
 
+def cluster_goodness(cluster_points, centroid):
+    '''distance from each point to centroid for each cluster'''
+    pass
+
+def total_goodness(clustering, centroids):
+    '''distance from each point to centroid for each cluster'''
+    pass
+
 def print_confusion_matrix(matrix):
     classes = matrix.keys()
     row = ""
@@ -40,6 +48,25 @@ def purity(predicted, observed):
     max_values = []
     for cls in matrix.keys():
         max_values.append(max(matrix[cls].values()))
+    return sum(max_values)/len(observed)
+
+def purity_corrected(predicted, observed):
+    matrix = confusion_matrix(predicted, observed)
+    max_values = []
+    out_classes = []
+    for cls in matrix.keys():
+        values = list(matrix[cls].values())
+        classes = list(matrix[cls].keys())
+        found_max = False
+        while not found_max and len(classes)>0:
+            cls_to_remove = classes[values.index(max(values))]
+            if not cls_to_remove in out_classes:
+                out_classes.append(cls_to_remove)
+                max_values.append(max(values))
+                found_max = True
+            else:
+                del classes[values.index(max(values))]
+                del values[values.index(max(values))]
     return sum(max_values)/len(observed)
 
 def cluster_entropy(cluster):
@@ -128,14 +155,17 @@ predicted3 = np.array(("o", "o", "o", "o", "o", "d", "d", "d",
 mat = confusion_matrix(predicted, observed)
 print_confusion_matrix(mat)
 print(purity(predicted, observed))
+print(purity_corrected(predicted, observed))
 print(total_entropy(predicted, observed))
 print()
 mat = confusion_matrix(predicted2, observed)
 print_confusion_matrix(mat)
 print(purity(predicted2, observed))
+print(purity_corrected(predicted2, observed))
 print(total_entropy(predicted2, observed))
 print()
 mat = confusion_matrix(predicted3, observed)
 print_confusion_matrix(mat)
 print(purity(predicted3, observed))
+print(purity_corrected(predicted3, observed))
 print(total_entropy(predicted3, observed))
