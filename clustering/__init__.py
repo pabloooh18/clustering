@@ -4,6 +4,8 @@ import kmeans
 import processing
 import numpy as np
 
+import error_metrics as err
+
 # load precalculated docs
 with open("../outputs/original/rouge_docs.p", "rb") as fin:
     docs = pickle.load(fin)
