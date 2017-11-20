@@ -29,4 +29,4 @@ def kmeans(duc_vectorized_documents, means=np.array([])):
     else:
         kmeans = KMeans(n_clusters=label,
                         algorithm="full").fit(x)
-    return kmeans.labels_, kmeans.cluster_centers_, y, tags
+    return kmeans.labels_, kmeans.cluster_centers_, np.array(tags), np.array(y)
