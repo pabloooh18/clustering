@@ -1,38 +1,55 @@
-import duc
+import pickle
+import kmeans
 
-data_folder_original = "../res/original"
+import processing
+import numpy as np
+
+# load precalculated docs
+with open("../outputs/original/rouge_docs.p", "rb") as fin:
+    docs = pickle.load(fin)
+with open("../outputs/original/rouge_vect_docs.p", "rb") as fin:
+    vect_docs = pickle.load(fin)
+with open("../outputs/original/rouge_space.p", "rb") as fin:
+    space = pickle.load(fin)
+with open("../outputs/original/rouge_centroids.p", "rb") as fin:
+    ideal_centroids = pickle.load(fin)
+
 data_folder_summ10 = "../res/summ10"
 data_folder_summ100 = "../res/summ100"
 
-output_folder_original = "../output/original"
-output_folder_summ10 = "../output/summ10"
-output_folder_summ100 = "../output/summ100"
+# get seed centroids
+init_centroids = processing.get_initial_centroids(vect_docs, ideal_centroids)
 
-# Text dumps
-out_documents_file = "/rouge_docs.txt"
-out_rouge_space_file = "/rouge_space.txt"
-out_vectorized_documents_file = "/rouge_vect_docs.txt"
-out_centroids_file = "/rouge_centroids.txt"
+base_init, means_init, tags_init, expected_init = kmeans.kmeans(
+                                                     vect_docs,
+                                                     init_centroids)
+base_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
+                                    vect_docs,
+                                    np.array(list(ideal_centroids.values())))
+import ipdb;ipdb.set_trace()
+del vect_docs
+del docs
 
-#Pickled dumps
-p_documents_file = "/rouge_docs.p"
-p_rouge_space_file = "/rouge_space.p"
-p_vectorized_documents_file = "/rouge_vect_docs.p"
-p_centroids_file = "/rouge_centroids.p"
+docs = duc.get_rouge_summary_clusters(data_folder_summ10)
+vect_docs = duc.convert_to_vectors(docs, space)
 
-# Rouge centroids
-documents = duc.get_rouge_document_clusters(data_folder_original)
-duc.dump(documents, output_folder_original + out_documents_file)
-duc.pickle_dump(documents, output_folder_original + p_documents_file)
+summ10_init, means_init, tags_init, expected_init = kmeans.kmeans(
+                                                                vect_docs,
+                                                                init_centroids)
+summ10_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
+                                    vect_docs,
+                                    np.array(list(ideal_centroids.values())))
 
-rouge_space = duc.get_vector_space_from_clusters(documents)
-duc.dump(rouge_space, output_folder_original + out_rouge_space_file)
-duc.pickle_dump(rouge_space, output_folder_original +  p_rouge_space_file)
+import ipdb;ipdb.set_trace()
+del vect_docs
+del docs
 
-vectorized_documents = duc.convert_to_vectors(documents, rouge_space)
-duc.dump(vectorized_documents, output_folder_original + out_vectorized_documents_file)
-duc.pickle_dump(vectorized_documents, output_folder_original + p_vectorized_documents_file)
+docs = duc.get_rouge_summary_clusters(data_folder_summ100)
+vect_docs = duc.convert_to_vectors(docs, space)
 
-centroids = duc.get_cluster_centroids(vectorized_documents)
-duc.dump(centroids, output_folder_original + out_centroids_file)
-duc.pickle_dump(centroids, output_folder_original + p_centroids_file)
+summ100_init, means_init, tags_init, expected_init = kmeans.kmeans(
+                                                                vect_docs,
+                                                                init_centroids)
+summ100_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
+                                    vect_docs,
+                                    np.array(list(ideal_centroids.values())))
