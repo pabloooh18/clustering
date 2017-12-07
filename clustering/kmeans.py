@@ -25,6 +25,7 @@ def kmeans(duc_vectorized_documents, means=np.array([])):
     #means=means.tolist() #convierte en una lista pero solo una.
     #means=list(means) #con list() queda como una matris pero con el formato array([])  
     label = 0
+    
     for cluster in duc_vectorized_documents:
         for document in duc_vectorized_documents[cluster]:
             y.append(label)
