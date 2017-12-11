@@ -1,18 +1,31 @@
 from nltk.cluster import util
 from sklearn.cluster import k_means_
 from sklearn.cluster import KMeans
+from nltk.cluster import KMeansClusterer, euclidean_distance, cosine_distance
 import numpy as np
+import inspect
 
 def new_euclidean_distances(X, Y=None, Y_norm_squared=None, squared=False):
     return util.cosine_distance(X,Y)
 
-k_means_.euclidean_distances = new_euclidean_distances
+
+def new_multiply(X, Y=None, Y_norm_squared=None, squared=False):
+    import ipdb; ipdb.set_trace()
+    return np.sum(np.multiply(X,Y))
+
+k_means_.euclidean_distances = new_multiply
+
+
+
 
 def kmeans(duc_vectorized_documents, means=np.array([])):
     tags = []
     y = []
-    x = np.array([])
+    x = np.array([])       
+    #means=means.tolist() #convierte en una lista pero solo una.
+    #means=list(means) #con list() queda como una matris pero con el formato array([])  
     label = 0
+    
     for cluster in duc_vectorized_documents:
         for document in duc_vectorized_documents[cluster]:
             y.append(label)
@@ -22,11 +35,17 @@ def kmeans(duc_vectorized_documents, means=np.array([])):
             else:
                 x = np.vstack([x, duc_vectorized_documents[cluster][document]])
         label += 1
-    if len(means)>0:
-        kmeans = KMeans(n_clusters=label,
-                        init=means,
-                        algorithm="full").fit(x)
-    else:
-        kmeans = KMeans(n_clusters=label,
-                        algorithm="full").fit(x)
-    return kmeans.labels_, kmeans.cluster_centers_, np.array(tags), np.array(y)
+    #if len(means)>0:
+    x=[np.array(f) for f in x]
+    import ipdb
+    ipdb.set_trace()        
+    kmean = KMeansClusterer(label, distance=euclidean_distance,initial_means=means,avoid_empty_clusters=True)
+
+    kmeans = kmean.cluster(x)
+        # KMeans(n_clusters=label,init=means,algorithm="full").fit(x)
+    #else:    
+      # kmean = KMeansClusterer(label, distance=euclidean_distance)
+       #kmeans = kmean.cluster(x)
+        #KMeans(n_clusters=label,algorithm="full").fit(x)
+
+    return kmeans, kmean.means(), np.array(tags), np.array(y)
