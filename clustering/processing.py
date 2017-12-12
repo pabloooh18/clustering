@@ -73,8 +73,12 @@ def get_initial_centroids(vect_docs, ideal_centroids):
                 if candidate_distance < min_distance:
                     min_distance = candidate_distance
                     candidate = vect_docs[cluster][document]
-        if len(init_centroids) == 0:
+        if len(init_centroids) == 0:         
             init_centroids = candidate
         else:
+            #import ipdb
+            #ipdb.set_trace() 
+            #init_centroids.append(init_centroids)
             init_centroids = np.vstack([init_centroids, candidate])
+            #init_centroids.append(candidate) 
     return init_centroids
