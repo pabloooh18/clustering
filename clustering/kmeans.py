@@ -18,14 +18,14 @@ k_means_.euclidean_distances = new_multiply
 
 
 
-def kmeans(duc_vectorized_documents, means=np.array([])):
+def kmeans(duc_vectorized_documents, means):
     tags = []
     y = []
-    x = np.array([])       
+    x = []       
     #means=means.tolist() #convierte en una lista pero solo una.
-    #means=list(means) #con list() queda como una matris pero con el formato array([])  
+    means=[list(f) for f in means] #con list() queda como una matris pero con el formato array([])  
     label = 0
-    
+
     for cluster in duc_vectorized_documents:
         for document in duc_vectorized_documents[cluster]:
             y.append(label)
@@ -36,12 +36,12 @@ def kmeans(duc_vectorized_documents, means=np.array([])):
                 x = np.vstack([x, duc_vectorized_documents[cluster][document]])
         label += 1
     #if len(means)>0:
+    #import ipdb
+    #ipdb.set_trace()
     x=[np.array(f) for f in x]
-    import ipdb
-    ipdb.set_trace()        
+            
     kmean = KMeansClusterer(label, distance=euclidean_distance,initial_means=means,avoid_empty_clusters=True)
-
-    kmeans = kmean.cluster(x)
+    kmeans = kmean.cluster(x,True)
         # KMeans(n_clusters=label,init=means,algorithm="full").fit(x)
     #else:    
       # kmean = KMeansClusterer(label, distance=euclidean_distance)

@@ -26,6 +26,7 @@ def demo():
     means = [[4, 3], [5, 5]]
     means=numpy.array(means)
     means=means.tolist()
+    #   means=numpy.asarray(means)
 
     import ipdb
     ipdb.set_trace()
