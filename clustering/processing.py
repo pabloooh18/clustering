@@ -34,7 +34,10 @@ def get_vector_representation(token_set, space):
     vector = np.zeros(len(space))
     for token in token_set:
         if token in space:
-            vector[space.index(token)] = 1.0
+
+            vector[space.index(token)] = token_set.count(token) #cambie esta linea por los 1.0
+    #import ipdb
+    #ipdb.set_trace()       
     return vector
 
 def get_document_vectors(documents, rouge_space):
