@@ -1,17 +1,64 @@
-K-means 50 clusters (centroid seeded)
+K-means 50 clusters (given centroid)
 
-Complete documents
-purity : 0.876
-f1 : 0.900622195747
-entropy : 0.583970469182
+Original (euclidean)
 
-Sum100
-purity : 0.66
-f1 : 0.498078380723
-entropy : 1.20295201143
+purity : 0.964
+purity corr : 0.964
+f1 : 0.964232516112
+entropy : 0.147060146381
 
-Sum10
-purity : 0.1695
-f1 : 0.0812850411753
-entropy : 4.30810132307
+Original (cosine)
 
+purity : 0.978
+purity corr : 0.978
+f1 : 0.977730655399
+entropy : 0.0833692073919
+
+Original (multiplication)
+
+purity : 0.978
+purity corr : 0.978
+f1 : 0.977478130147
+entropy : 0.0793688772336
+
+Summ100 (euclidean)
+
+purity : 0.56
+purity corr : 0.56
+f1 : 0.492808524809
+entropy : 1.65994825965
+
+Summ100 (cosine)
+
+purity : 0.985
+purity corr : 0.985
+f1 : 0.982545454545
+entropy : 0.0344829847612
+
+Summ100 (multiplication)
+
+purity : 0.985
+purity corr : 0.985
+f1 : 0.984761904762
+entropy : 0.0541446071166
+
+Summ10 (euclidean)
+
+purity : 0.1105
+purity corr : 0.1105
+f1 : 0.0734880325735
+entropy : 4.92849825021
+
+Summ10 (cosine)
+
+purity : 0.9065
+purity corr : 0.9065
+f1 : 0.903781474497
+entropy : 0.42595333366
+
+Summ10 (multiplication)
+
+purity : 0.871
+purity corr : 0.871
+f1 : 0.869433598676
+entropy : 0.612386019069
