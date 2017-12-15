@@ -73,7 +73,10 @@ def cluster_entropy(cluster):
     total_cluster_elements = sum((v for v in cluster.values()))
     cluster_entropy = 0.
     for cls in cluster.keys():
-        p_of_cls = cluster[cls] / total_cluster_elements
+        if total_cluster_elements == 0:
+            p_of_cls = 0
+        else:
+            p_of_cls = cluster[cls] / total_cluster_elements
         if p_of_cls > 0:
             cluster_entropy += p_of_cls * math.log(p_of_cls, 2)
     return (-1)*cluster_entropy
@@ -117,6 +120,8 @@ def table_of_confusion_class(predicted, observed, cls):
 def precision_class(predicted, observed, cls):
     tp = true_positives_class(predicted, observed, cls)
     fp = false_positives_class(predicted, observed, cls)
+    if tp == 0:
+        return 0
     return tp/(tp + fp)
 
 def recall_class(predicted, observed, cls):

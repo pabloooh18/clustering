@@ -58,6 +58,7 @@ del vect_docs
 
 docs = duc.get_rouge_summary_clusters(data_folder_summ100)
 vect_docs = duc.convert_to_vectors(docs, space, binary_vectorizer)
+
 print_results(vect_docs,
               medium_vectors,
               util.euclidean_distance,
@@ -75,13 +76,21 @@ print_results(vect_docs,
 del docs
 del vect_docs
 
-import ipdb;ipdb.set_trace()
-
 docs = duc.get_rouge_summary_clusters(data_folder_summ10)
 vect_docs = duc.convert_to_vectors(docs, space, binary_vectorizer)
 print_results(vect_docs,
               medium_vectors,
               util.euclidean_distance,
               "Summ10 (euclidean)")
+
+print_results(vect_docs,
+              medium_vectors,
+              util.cosine_distance,
+              "Summ10 (cosine)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.matching_distance,
+              "Summ10 (multiplication)")
 del docs
 del vect_docs
