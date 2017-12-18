@@ -11,7 +11,7 @@ def frequency_vectorizer(token_set, space):
     vector = np.zeros(len(space))
     for token in token_set:
         if token in space:
-            import ipdb;ipdb.set_trace()
+            #import ipdb;ipdb.set_trace()
             vector[space.index(token)] = token_set.count(token) #cambie esta linea por los 1.0
     #import ipdb
     #ipdb.set_trace()       
