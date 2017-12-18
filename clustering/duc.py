@@ -16,12 +16,26 @@ def get_rouge_tokens(original_text):
        Frequency irrelevant
        Capitalized named entities
     '''
+    #import ipdb;ipdb.set_trace()
     lemmatized = lemmatize(original_text)
     table = str.maketrans(dict.fromkeys(punctuation))
     en_stopwords = set(stopwords.words('english'))
     tokens = [word for word in word_tokenize(lemmatized.translate(table))
               if word not in en_stopwords]
     return set(tokens)
+
+def get_rouge_tokens_original(original_text):
+    '''lemmatized tokens with no stopwords nor punctuation
+       Frequency relevant
+       Capitalized named entities
+    '''
+    #import ipdb;ipdb.set_trace()
+    lemmatized = lemmatize(original_text)
+    table = str.maketrans(dict.fromkeys(punctuation))
+    en_stopwords = set(stopwords.words('english'))
+    tokens = [word for word in word_tokenize(lemmatized.translate(table))
+              if word not in en_stopwords]
+    return tokens
 
 def get_rouge_document_clusters(data_folder_original):
     '''returns documents as rouge tokens, ordered by cluster'''
@@ -37,7 +51,7 @@ def get_rouge_document_clusters(data_folder_original):
             tree = ET.parse(document_path)
             root = tree.getroot()
             original_text = root.find("TEXT").text
-            token_set = get_rouge_tokens(original_text)
+            token_set = get_rouge_tokens(original_text) # se cambio la funcion get_rouge_tokens
             documents[cluster][document] = token_set
     return documents
 
@@ -54,21 +68,22 @@ def get_rouge_summary_clusters(data_folder_original):
             document_path = cluster_folder + "/" + document
             with open(document_path, "r") as fin:
                 original_text = fin.read()
-            token_set = get_rouge_tokens(original_text)
+            token_set = get_rouge_tokens(original_text) # se cambio la funcion get_rouge_tokens
             documents[cluster][document] = token_set
     return documents
 
-def convert_to_vectors(documents, vector_space):
+def convert_to_vectors(documents, vector_space, vectorizer):
     # Calculates the representation
     vectorized_documents = {}
     for cluster in documents:
         vectorized_documents[cluster] = {}
         for document_name in documents[cluster]:
             document = documents[cluster][document_name]
-            vectorized_documents[cluster][document_name] = \
-                                                    get_vector_representation(
-                                                                    document,
-                                                                    vector_space)
+            #import ipdb;ipdb.set_trace()
+            #if document_name=='APW19981027.0491': import ipdb;ipdb.set_trace()
+            vectorized_documents[cluster][document_name] = vectorizer(
+                                                                document,
+                                                                vector_space)
     return vectorized_documents
 
 def get_vector_space_from_clusters(documents):
@@ -89,6 +104,25 @@ def get_cluster_centroids(vectorized_documents):
                                             )
                                 )
     return centroids
+
+def get_matching_vectors(vectorized_documents):
+    '''Vectors for the multiplication-based distance
+       logical and between all of them.
+    '''
+    centroids = {}
+    for cluster in vectorized_documents:
+        for docid, vector in vectorized_documents[cluster].items():
+            try:
+                centroids[cluster] = np.add(centroids[cluster],
+                                            vector)
+            except:
+                #print( "%s (%s)" % (cluster, docid))
+                centroids[cluster] = vector
+                continue
+        # To binary
+        centroids[cluster] = (centroids[cluster]>0)*1.
+    return centroids
+
 
 def jsonify(dictionary):
     if isinstance(dictionary, np.ndarray) or\

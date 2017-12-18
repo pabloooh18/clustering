@@ -1,12 +1,13 @@
 import duc
+import representation
 
 data_folder_original = "../res/original"
 data_folder_summ10 = "../res/summ10"
 data_folder_summ100 = "../res/summ100"
 
-output_folder_original = "../output/original"
-output_folder_summ10 = "../output/summ10"
-output_folder_summ100 = "../output/summ100"
+output_folder_original = "../outputs/original"
+output_folder_summ10 = "../outputs/summ10"
+output_folder_summ100 = "../outputs/summ100"
 
 # Text dumps
 out_documents_file = "/rouge_docs.txt"
@@ -29,7 +30,7 @@ rouge_space = duc.get_vector_space_from_clusters(documents)
 duc.dump(rouge_space, output_folder_original + out_rouge_space_file)
 duc.pickle_dump(rouge_space, output_folder_original +  p_rouge_space_file)
 
-vectorized_documents = duc.convert_to_vectors(documents, rouge_space)
+vectorized_documents = duc.convert_to_vectors(documents, rouge_space, representation.frequency_vectorizer)
 duc.dump(vectorized_documents, output_folder_original + out_vectorized_documents_file)
 duc.pickle_dump(vectorized_documents, output_folder_original + p_vectorized_documents_file)
 

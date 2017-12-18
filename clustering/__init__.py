@@ -1,7 +1,10 @@
 import pickle
-import kmeans
+from nltk.cluster import util
 
+from representation import binary_vectorizer
 import processing
+import algorithms
+import distances
 import duc
 import numpy as np
 
@@ -15,77 +18,94 @@ with open("../outputs/original/rouge_vect_docs.p", "rb") as fin:
 with open("../outputs/original/rouge_space.p", "rb") as fin:
     space = pickle.load(fin)
 with open("../outputs/original/rouge_centroids.p", "rb") as fin:
-    ideal_centroids = pickle.load(fin)
+    medium_vectors = pickle.load(fin)
+
+matching_vectors = duc.get_matching_vectors(vect_docs) # Calculated only once
 
 data_folder_summ10 = "../res/summ10"
 data_folder_summ100 = "../res/summ100"
 
-# get seed centroids
-init_centroids = processing.get_initial_centroids(vect_docs, ideal_centroids)
+def print_results(vectors, centroids, distance, title="Result"):
+    results, means, tags, expected = algorithms.assign_to_centroid(
+                                        vectors,
+                                        np.array(list(centroids.values())),
+                                        distance=distance
+                                        )
+    print("\n%s\n" % title)
+    print("purity : %s" % err.purity(results, expected))
+    print("purity corr : %s" % err.purity_corrected(results, expected))
+    print("f1 : %s" % err.general_f1(results, expected))
+    print("entropy : %s" % err.total_entropy(results, expected))
 
-base_init, means_init, tags_init, expected_init = kmeans.kmeans(
-                                                     vect_docs,
-                                                     init_centroids)
-print("init purity : %s" % err.purity(base_init, expected_init))
-print("init purity corr : %s" % err.purity_corrected(base_init, expected_init))
-print("init f1 : %s" % err.general_f1(base_init, expected_init))
-print("init entropy : %s" % err.total_entropy(base_init, expected_init))
 
-base_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
-                                    vect_docs,
-                                    np.array(list(ideal_centroids.values())))
-print("ideal purity : %s" % err.purity(base_ideal, expected_ideal))
-print("ideal purity corr : %s" % err.purity_corrected(base_ideal,
-                                                      expected_ideal))
-print("ideal f1 : %s" % err.general_f1(base_ideal, expected_ideal))
-print("ideal entropy : %s" % err.total_entropy(base_ideal, expected_ideal))
+print_results(vect_docs,
+              medium_vectors,
+              util.euclidean_distance,
+              "Original (euclidean)")
 
+print_results(vect_docs,
+              medium_vectors,
+              util.cosine_distance,
+              "Original (cosine)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.matching_distance,
+              "Original (multiplication)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Original (f1)")
+del docs
+del vect_docs
+
+
+docs = duc.get_rouge_summary_clusters(data_folder_summ100)
+vect_docs = duc.convert_to_vectors(docs, space, binary_vectorizer)
+
+print_results(vect_docs,
+              medium_vectors,
+              util.euclidean_distance,
+              "Summ100 (euclidean)")
+
+print_results(vect_docs,
+              medium_vectors,
+              util.cosine_distance,
+              "Summ100 (cosine)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.matching_distance,
+              "Summ100 (multiplication)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Summ100 (f1)")
 del docs
 del vect_docs
 
 docs = duc.get_rouge_summary_clusters(data_folder_summ10)
-vect_docs = duc.convert_to_vectors(docs, space)
+vect_docs = duc.convert_to_vectors(docs, space, binary_vectorizer)
+print_results(vect_docs,
+              medium_vectors,
+              util.euclidean_distance,
+              "Summ10 (euclidean)")
 
-print("\nSum10")
+print_results(vect_docs,
+              medium_vectors,
+              util.cosine_distance,
+              "Summ10 (cosine)")
 
-summ10_init, means_init, tags_init, expected_init = kmeans.kmeans(
-                                                                vect_docs,
-                                                                init_centroids)
-print("init purity : %s" % err.purity(summ10_init, expected_init))
-print("init purity corr : %s" % err.purity_corrected(summ10_init, expected_init))
-print("init f1 : %s" % err.general_f1(summ10_init, expected_init))
-print("init entropy : %s" % err.total_entropy(summ10_init, expected_init))
+print_results(vect_docs,
+              matching_vectors,
+              distances.matching_distance,
+              "Summ10 (multiplication)")
 
-summ10_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
-                                    vect_docs,
-                                    np.array(list(ideal_centroids.values())))
-print("ideal purity : %s" % err.purity(summ10_ideal, expected_ideal))
-print("ideal purity corr : %s" % err.purity_corrected(summ10_ideal,
-                                                      expected_ideal))
-print("ideal f1 : %s" % err.general_f1(summ10_ideal, expected_ideal))
-print("ideal entropy : %s" % err.total_entropy(summ10_ideal, expected_ideal))
-
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Summ10 (f1)")
 del docs
 del vect_docs
-
-docs = duc.get_rouge_summary_clusters(data_folder_summ100)
-vect_docs = duc.convert_to_vectors(docs, space)
-
-print("\nSum100")
-
-summ100_init, means_init, tags_init, expected_init = kmeans.kmeans(
-                                                                vect_docs,
-                                                                init_centroids)
-print("init purity : %s" % err.purity(summ100_init, expected_init))
-print("init purity corr : %s" % err.purity_corrected(summ100_init, expected_init))
-print("init f1 : %s" % err.general_f1(summ100_init, expected_init))
-print("init entropy : %s" % err.total_entropy(summ100_init, expected_init))
-
-summ100_ideal, means_ideal, tags_ideal, expected_ideal = kmeans.kmeans(
-                                    vect_docs,
-                                    np.array(list(ideal_centroids.values())))
-print("ideal purity : %s" % err.purity(summ100_ideal, expected_ideal))
-print("ideal purity corr : %s" % err.purity_corrected(summ100_ideal,
-                                                      expected_ideal))
-print("ideal f1 : %s" % err.general_f1(summ100_ideal, expected_ideal))
-print("ideal entropy : %s" % err.total_entropy(summ100_ideal, expected_ideal))
