@@ -52,6 +52,11 @@ print_results(vect_docs,
               matching_vectors,
               distances.matching_distance,
               "Original (multiplication)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Original (f1)")
 del docs
 del vect_docs
 
@@ -73,6 +78,11 @@ print_results(vect_docs,
               matching_vectors,
               distances.matching_distance,
               "Summ100 (multiplication)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Summ100 (f1)")
 del docs
 del vect_docs
 
@@ -92,5 +102,10 @@ print_results(vect_docs,
               matching_vectors,
               distances.matching_distance,
               "Summ10 (multiplication)")
+
+print_results(vect_docs,
+              matching_vectors,
+              distances.f1_distance,
+              "Summ10 (f1)")
 del docs
 del vect_docs
