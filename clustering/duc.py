@@ -51,7 +51,7 @@ def get_rouge_document_clusters(data_folder_original):
             tree = ET.parse(document_path)
             root = tree.getroot()
             original_text = root.find("TEXT").text
-            token_set = get_rouge_tokens(original_text) # se cambio la funcion get_rouge_tokens
+            token_set = get_rouge_tokens(original_text) # para usar la repeticion, usar get_rouge_tokens_original
             documents[cluster][document] = token_set
     return documents
 
@@ -68,7 +68,7 @@ def get_rouge_summary_clusters(data_folder_original):
             document_path = cluster_folder + "/" + document
             with open(document_path, "r") as fin:
                 original_text = fin.read()
-            token_set = get_rouge_tokens(original_text) # se cambio la funcion get_rouge_tokens
+            token_set = get_rouge_tokens(original_text) # para usar la repeticion, usar get_rouge_tokens_original
             documents[cluster][document] = token_set
     return documents
 
@@ -83,7 +83,7 @@ def convert_to_vectors(documents, vector_space, vectorizer):
             #if document_name=='APW19981027.0491': import ipdb;ipdb.set_trace()
             vectorized_documents[cluster][document_name] = vectorizer(
                                                                 document,
-                                                                vector_space)
+                                                                vector_space,documents,cluster)
     return vectorized_documents
 
 def get_vector_space_from_clusters(documents):
