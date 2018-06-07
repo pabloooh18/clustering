@@ -55,6 +55,28 @@ def get_rouge_document_clusters(data_folder_original):
             documents[cluster][document] = token_set
     return documents
 
+#prueba de funcion !!!
+def get_rouge_document(data_folder_original):
+    '''returns documents, ordered by cluster'''
+    cluster_ids = os.listdir(data_folder_original)
+    documents = {}
+    #import ipdb;ipdb.set_trace()
+    # Gets the tokens
+    for cluster in cluster_ids:
+        cluster_folder = data_folder_original + "/" + cluster
+        documents[cluster] = {}
+        for document in os.listdir(cluster_folder):
+            document_path = cluster_folder + "/" + document
+            tree = ET.parse(document_path)
+            root = tree.getroot()
+            original_text = root.find("TEXT").text
+            lemmatized = lemmatize(original_text)
+            table = str.maketrans(dict.fromkeys(punctuation))
+            en_stopwords = set(stopwords.words('english'))
+            tokens = lemmatized.translate(table)    
+            documents[cluster][document] = tokens           
+    return documents
+
 def get_rouge_summary_clusters(data_folder_original):
     '''returns documents as rouge tokens, ordered by cluster'''
     cluster_ids = os.listdir(data_folder_original)
