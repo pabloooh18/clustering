@@ -29,7 +29,7 @@ def backtrack_lcs_matrix(matrix, s1, s2, i, j):
         return []
 
     if s1[i-1] == s2[j-1]:
-        return backtrack_lcs_matrix(matrix, s1, s2, i-1, j-1) + [i-1] #para usar palabras [s1[i-1]]
+        return backtrack_lcs_matrix(matrix, s1, s2, i-1, j-1) + [s1[i-1]] #para usar palabras [s1[i-1]]
     if matrix[i][j-1] > matrix[i-1][j]:
         return backtrack_lcs_matrix(matrix, s1, s2, i, j-1)
     return backtrack_lcs_matrix(matrix, s1, s2, i-1, j)
@@ -57,8 +57,8 @@ def all_backtrack_lcs_matrix(matrix, s1, s2, i, j):
 def lcs(s1, s2, joiner=""):
     matrix = lcs_matrix(s1, s2)
     #import ipdb;ipdb.set_trace()
-    #return joiner.join(backtrack_lcs_matrix(matrix, s1, s2, len(s1), len(s2))) #para devolver palabras 
-    return backtrack_lcs_matrix(matrix, s1, s2, len(s1), len(s2))
+    return joiner.join(backtrack_lcs_matrix(matrix, s1, s2, len(s1), len(s2))) #para devolver palabras 
+    #return backtrack_lcs_matrix(matrix, s1, s2, len(s1), len(s2))
 
 def all_lcs(s1, s2, joiner=""):
     matrix = lcs_matrix(s1, s2)

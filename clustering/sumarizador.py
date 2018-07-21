@@ -24,7 +24,9 @@ contains_words4=[]
 score_doc1=[]
 score_doc2=[]
 sentence_list=[]
+result_lcs=[]
 resume=""
+resume_printf=""
 #import ipdb;ipdb.set_trace()
 # Gets the tokens
 for cluster in cluster_ids:
@@ -53,99 +55,77 @@ for cluster in cluster_ids:
 		if var==0:
 			first_document=tokens
 			first_sentence_list=sentence_list
+			first_original_sentence_list=sent_tokenize_list
 			sentence_list=[]
 			var=1 
 		else:
 			#import ipdb;ipdb.set_trace() 
-			tokenized_phrase1 = first_document.split(" ")
-			tokenized_phrase2 = tokens.split(" ")
-			
+			if var==2:
+				first_document=resume
+				first_original_sentence_list = sent_tokenize(resume_printf)
+				for sentence in first_original_sentence_list: #quita puntuacion y stopwords de cada oracion			
+					sentence = ' '.join([word for word in word_tokenize(sentence.translate(table))
+				  						if word not in en_stopwords])
+					first_sentence_list.append(sentence)
+				#import ipdb;ipdb.set_trace()	
+				tokenized_phrase1 = first_document.split(" ")
+				tokenized_phrase2 = tokens.split(" ")
+				resume=""
+				resume_printf=""
+
+			else:
+				var=2	
+				tokenized_phrase1 = first_document.split(" ")
+				tokenized_phrase2 = tokens.split(" ")
+				
 			# tokenized_phrase1 = "Hay una abeja Hay una flor La abeja hace miel La miel es cara".split(" ")
 			# tokenized_phrase2 = "La abeja va hasta flor para hacer miel que se vende cara en el mercado".split(" ")
 			# first_sentence_list = ["Hay una abeja","Hay una flor","La abeja hace miel","La miel es cara"]
 			# sentence_list = ["La abeja va hasta flor para hacer miel que se vende cara en el mercado"]			
-			result_lcs=lcs(tokenized_phrase1, tokenized_phrase2, " ")
+			result_lcs=lcs(tokenized_phrase1, tokenized_phrase2, " ").split(" ")
 			count=0				
 			while count == 0:
-				#import ipdb;ipdb.set_trace()
-				for elem in result_lcs:					
-					if tokenized_phrase1[elem] in first_sentence_list[count]:
-						contains_words1.append(elem)
-						
-					if tokenized_phrase2[elem] in sentence_list[count]:
-						contains_words3.append(elem)
-			
-				score_doc1=len(contains_words1)/len(first_sentence_list[count].split(" "))	
-				score_doc2=len(contains_words3)/len(sentence_list[count].split(" "))
-				if score_doc1 > score_doc2:
-					resume= resume + first_sentence_list[count] + " "
-					for elem in contains_words1:
-						result_lcs.remove(elem)
-					first_sentence_list.pop(count)
-				else:
-					resume= resume + sentence_list[count] + ". "
-					for elem in contains_words3:
-						result_lcs.remove(elem)
-					sentence_list.pop(count)			
-
 				if not result_lcs:
-					break;	
-				
-				contains_words1=[]
-				contains_words3=[]
-				
+					break;
+				else:	
 
-			# resume = ' '.join([word for word in word_tokenize(resume.translate(table))
-			#   								if word not in en_stopwords])	
-			# import ipdb;ipdb.set_trace()
+					if first_sentence_list:
+						contains_words1=lcs(result_lcs,first_sentence_list[count].split(" ")," ").split(" ")
+						score_doc1=len(contains_words1)/len(first_sentence_list[count].split(" "))	
+					if sentence_list:
+						contains_words3=lcs(result_lcs,sentence_list[count].split(" "), " ").split(" ")			
+						score_doc2=len(contains_words3)/len(sentence_list[count].split(" "))
+					if score_doc1 > score_doc2:
+						if len(contains_words1)>0:
+							resume= resume + first_sentence_list[count]
+							resume_printf = resume_printf + first_original_sentence_list[count]
+							#import ipdb;ipdb.set_trace()
+							for elem in contains_words1:
+								if elem in result_lcs:	
+									result_lcs.remove(elem)
+								
+							first_original_sentence_list.pop(count)		
+							first_sentence_list.pop(count)
+					else:
+						if len(contains_words3)>0:
+							resume= resume + sentence_list[count]
+							resume_printf = resume_printf + sent_tokenize_list[count]
+							for elem in contains_words3:
+								if elem in result_lcs:
+									result_lcs.remove(elem)
+									
+							sentence_list.pop(count)
+							sent_tokenize_list.pop(count)			
+
+						
+					#import ipdb;ipdb.set_trace()
+					contains_words1=[]
+					contains_words3=[]
+					score_doc1=0
+					score_doc2=0				
 
 			print("Resumen: ", resume)
-
-
-
-
-			#para el primer documento		
-			# for sentence in first_sent_tokenize_list: 
-			# 	sentence = ' '.join([word for word in word_tokenize(sentence.translate(table))
-			#   						if word not in en_stopwords]) 
-			# 	sentence=sentence.split(" ")				
-			# 	for elem in first_document:					
-			# 		if tokenized_phrase1[elem] in sentence:
-			# 			contains_words1.append(tokenized_phrase1[elem])
-			# 	#	import ipdb;ipdb.set_trace()	
-			# 	contains_words2.append(contains_words1)	#guarda las las palabras de la lcs que salen por oracion
-			# 	score_doc1.append(len(contains_words1)/len(sentence)) # guarda los scores
-			# 	contains_words1=[]						
-			# #para el segundo documento						
-			# for sentence in sent_tokenize_list: 
-			# 	sentence = ' '.join([word for word in word_tokenize(sentence.translate(table))
-			#   						if word not in en_stopwords]) 
-			# 	sentence=sentence.split(" ")				
-			# 	for elem in first_document:										
-			# 		if tokenized_phrase2[elem] in sentence:
-			# 			contains_words3.append(tokenized_phrase2[elem])
-							
-			# 	score_doc2.append(len(contains_words3)/len(sentence))	#guarda los scores			
-			# 	contains_words4.append(contains_words3) #guarda las las palabras de la lcs que salen por oracion
-			# 	contains_words3=[]	
-			# import ipdb;ipdb.set_trace()
 			
-					
-
-								
-			
-			   
 
 
 
-
-		# if var==1:
-		#     #import ipdb;ipdb.set_trace() 
-		#     tokenized_phrase1 = first_document.split(" ")
-		#     tokenized_phrase2 = tokens.split(" ")
-		#     print("LCS:", lcs(tokenized_phrase1, tokenized_phrase2, " "))
-		#     #print("All LCS:", all_lcs(first_document, tokens, " "))
-		#     var=0
-		# if var==0:
-		#     first_document=tokens
-		#     var=1   
