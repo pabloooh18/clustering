@@ -10,7 +10,7 @@ from processing import *
 from lcs import *
 from string import punctuation
 
-sys.setrecursionlimit(2000)
+sys.setrecursionlimit(5000)
 data_folder_original = "../res/original"
 
 
@@ -27,6 +27,7 @@ sentence_list=[]
 result_lcs=[]
 resume=""
 resume_printf=""
+count_printf=0
 #import ipdb;ipdb.set_trace()
 # Gets the tokens
 for cluster in cluster_ids:
@@ -35,7 +36,7 @@ for cluster in cluster_ids:
 	documents[cluster] = {}
 	var=0
 
-	for document in os.listdir(cluster_folder):
+	for document in os.listdir(cluster_folder):				
 		document_path = cluster_folder + "/" + document
 		tree = ET.parse(document_path)
 		root = tree.getroot()
@@ -96,7 +97,7 @@ for cluster in cluster_ids:
 						contains_words3=lcs(result_lcs,sentence_list[count].split(" "), " ").split(" ")			
 						score_doc2=len(contains_words3)/len(sentence_list[count].split(" "))
 					if score_doc1 > score_doc2:
-						if len(contains_words1)>0:
+						if contains_words1:
 							resume= resume + first_sentence_list[count]
 							resume_printf = resume_printf + first_original_sentence_list[count]
 							#import ipdb;ipdb.set_trace()
@@ -107,7 +108,7 @@ for cluster in cluster_ids:
 							first_original_sentence_list.pop(count)		
 							first_sentence_list.pop(count)
 					else:
-						if len(contains_words3)>0:
+						if contains_words3:
 							resume= resume + sentence_list[count]
 							resume_printf = resume_printf + sent_tokenize_list[count]
 							for elem in contains_words3:
@@ -122,9 +123,14 @@ for cluster in cluster_ids:
 					contains_words1=[]
 					contains_words3=[]
 					score_doc1=0
-					score_doc2=0				
+					score_doc2=0
 
-			print("Resumen: ", resume)
+			count_printf+=1	
+			if count_printf==10:
+				print("Resumen: ", resume_printf)
+				count_printf=0	
+			first_sentence_list=[]
+			sentence_list=[]
 			
 
 
