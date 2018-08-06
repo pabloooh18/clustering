@@ -1,17 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import copy
 import duc
 import os
+import locale
 import sys
 import xml.etree.ElementTree as ET
+import nltk.data
+import unicodedata
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from processing import *
 from lcs import *
+from freeling import *
 from string import punctuation
-
-sys.setrecursionlimit(5000)
-data_folder_original = "../res/original"
+es_sent_tokenize = nltk.data.load('tokenizers/punkt/spanish.pickle')
+def freeling_preprocess(raw_doc):
+    '''returns a list of sentences with their tokenizations'''
+    client = FreelingClient('localhost', 5005)
+    results = []
+    all_tokens = []
+    sentences = es_sent_tokenize.tokenize(raw_doc)
+    for sentence in sentences:
+        tokenized = client.sent_process(sentence)
+        results.append(tokenized)
+        all_tokens += tokenized
+    return results, all_tokens
+locale.setlocale(locale.LC_ALL, 'es_ES.utf8')
+sys.setrecursionlimit(10000)
+data_folder_original = "../spanish"
 
 
 
@@ -37,22 +56,17 @@ for cluster in cluster_ids:
 	var=0
 
 	for document in os.listdir(cluster_folder):				
-		document_path = cluster_folder + "/" + document
-		tree = ET.parse(document_path)
-		root = tree.getroot()
-		original_text = root.find("TEXT").text		
-		lemmatized = lemmatize(original_text)		
+		document_path = cluster_folder + "/" + document		
+		original_text = open(document_path, encoding='utf-8').read()
+		original_text = unicodedata.normalize("NFKD", original_text)
+		original_text = original_text.replace(u'\ufeff', u' ')
+		original_text = original_text.replace(u'\n', u' ')	
+		# original_text.encode('raw_unicode_escape').decode('utf-8')			
 		table = str.maketrans(dict.fromkeys(punctuation))
-		sent_tokenize_list = sent_tokenize(lemmatized)
-		en_stopwords = set(stopwords.words('english'))
-		tokens = ' '.join([word for word in word_tokenize(lemmatized.translate(table))
-			  if word not in en_stopwords])
-		#import ipdb;ipdb.set_trace()
-		for sentence in sent_tokenize_list: #quita puntuacion y stopwords de cada oracion			
-			sentence = ' '.join([word for word in word_tokenize(sentence.translate(table))
-			  						if word not in en_stopwords])
-			sentence_list.append(sentence)  						 
-		#import ipdb;ipdb.set_trace()	      
+		sent_tokenize_list = es_sent_tokenize.tokenize(original_text)			
+		sentence_list, tokens = freeling_preprocess(original_text)
+		#import ipdb;ipdb.set_trace()								 
+		#import ipdb;ipdb.set_trace()			      
 		if var==0:
 			first_document=tokens
 			first_sentence_list=sentence_list
@@ -62,22 +76,19 @@ for cluster in cluster_ids:
 		else:
 			#import ipdb;ipdb.set_trace() 
 			if var==2:
-				first_document=resume
-				first_original_sentence_list = sent_tokenize(resume_printf)
-				for sentence in first_original_sentence_list: #quita puntuacion y stopwords de cada oracion			
-					sentence = ' '.join([word for word in word_tokenize(sentence.translate(table))
-				  						if word not in en_stopwords])
-					first_sentence_list.append(sentence)
+				first_document=resume_printf
+				first_original_sentence_list = es_sent_tokenize.tokenize(resume_printf)					
+				first_sentence_list, tokens_resume = freeling_preprocess(first_document)	
 				#import ipdb;ipdb.set_trace()	
-				tokenized_phrase1 = first_document.split(" ")
-				tokenized_phrase2 = tokens.split(" ")
+				tokenized_phrase1 = resume_printf.split(" ")
+				tokenized_phrase2 = tokens
 				resume=""
 				resume_printf=""
 
 			else:
 				var=2	
-				tokenized_phrase1 = first_document.split(" ")
-				tokenized_phrase2 = tokens.split(" ")
+				tokenized_phrase1 = first_document
+				tokenized_phrase2 = tokens
 				
 			# tokenized_phrase1 = "Hay una abeja Hay una flor La abeja hace miel La miel es cara".split(" ")
 			# tokenized_phrase2 = "La abeja va hasta flor para hacer miel que se vende cara en el mercado".split(" ")
@@ -90,24 +101,25 @@ for cluster in cluster_ids:
 					break;
 				else:	
 					if first_sentence_list:
-						contains_words1=lcs(result_lcs,first_sentence_list[count].split(" ")," ").split(" ")
+						contains_words1=lcs(result_lcs,first_sentence_list[count]," ").split(" ")
 						if '' in contains_words1:
 							contains_words1.remove('')
-						score_doc1=len(contains_words1)/len(first_sentence_list[count].split(" "))	
+						score_doc1=len(contains_words1)/len(first_sentence_list[count])	
 					if sentence_list:
-						contains_words3=lcs(result_lcs,sentence_list[count].split(" "), " ").split(" ")	
+						contains_words3=lcs(result_lcs,sentence_list[count], " ").split(" ")	
 						if '' in contains_words3:
 							contains_words3.remove('')		
-						score_doc2=len(contains_words3)/len(sentence_list[count].split(" "))
+						score_doc2=len(contains_words3)/len(sentence_list[count])
 					if score_doc1 > score_doc2:											
 						for elem in contains_words1:
 							if elem in result_lcs:	
 								result_lcs.remove(elem)
 								flag=1
 						if flag==1:
-							resume= resume + first_sentence_list[count]
+							#resume= resume + first_sentence_list[count]
 							resume_printf = resume_printf + first_original_sentence_list[count]
-							flag=0	
+							flag=0
+															
 						first_original_sentence_list.pop(count)		
 						first_sentence_list.pop(count)
 					else:												
@@ -116,10 +128,10 @@ for cluster in cluster_ids:
 								result_lcs.remove(elem)
 								flag=1
 						if flag==1:
-							resume= resume + sentence_list[count]
+							#resume= resume + sentence_list[count]
 							resume_printf = resume_printf + sent_tokenize_list[count]
 							flag=0
-
+						
 						sentence_list.pop(count)
 						sent_tokenize_list.pop(count)			
 
@@ -132,8 +144,9 @@ for cluster in cluster_ids:
 
 			count_printf+=1	
 			if count_printf==9:
+			# 	import ipdb;ipdb.set_trace()
 				print("Resumen: ", resume_printf)
-				count_printf=0	
+			#	count_printf=0	
 			first_sentence_list=[]
 			sentence_list=[]
 			

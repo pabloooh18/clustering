@@ -54,5 +54,5 @@ def assign_to_centroid(duc_vectorized_documents, means, distance):
             if best_distance is None or dist <= best_distance:
                 best_index, best_distance = index, dist
         resultado.append(best_index)
-
+    #import ipdb;ipdb.set_trace()    
     return resultado, means, np.array(tags), np.array(y)

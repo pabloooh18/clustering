@@ -8,7 +8,7 @@ from nltk.tokenize import word_tokenize
 from processing import *
 from string import punctuation
 
-sys.setrecursionlimit(2000)
+sys.setrecursionlimit(5000)
 data_folder_original = "../res/original"
 
 def lcs_matrix(s1, s2):
