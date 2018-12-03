@@ -9,9 +9,23 @@ from nltk.tokenize import sent_tokenize
 from processing import *
 from lcs import *
 from string import punctuation
+from sklearn.feature_extraction.text import TfidfVectorizer
+from math import log
+import pandas as pd
 
 sys.setrecursionlimit(5000)
 data_folder_original = "../res/original"
+
+def flatten(multidim_list):
+    if isinstance(multidim_list, list):
+        if len(multidim_list) > 1:
+            return flatten(multidim_list[0]) + flatten(multidim_list[1:])
+        elif len(multidim_list) > 0:
+            return flatten(multidim_list[0])
+        else:
+            return []
+    else:
+        return [multidim_list]
 
 def summary_wordlimit(summary_sentences, sentence_scores, word_limit):
     limited_summary = []
@@ -29,6 +43,17 @@ def summary_wordlimit(summary_sentences, sentence_scores, word_limit):
     #import ipdb;ipdb.set_trace()
     return limited_summary
 			
+def calculate_idf(tokenized_documents):
+    type_set = list(set(flatten(tokenized_documents)))
+    idf = {}
+    total_num_of_docs = len(tokenized_documents)
+    for word in type_set:
+        idf[word] = 0
+        for document in tokenized_documents:
+            if word in document:
+                idf[word] += 1
+        idf[word] = log(total_num_of_docs / idf[word])
+    return idf
 
 cluster_ids = os.listdir(data_folder_original)
 documents = {}
@@ -36,8 +61,8 @@ contains_words1=[]
 contains_words2=[]
 contains_words3=[]
 contains_words4=[]
-score_doc1=[]
-score_doc2=[]
+score_doc1=0
+score_doc2=0
 sentence_list=[]
 result_lcs=[]
 summary_sentence_scores=[]
@@ -103,10 +128,10 @@ for cluster in cluster_ids:
 				tokenized_phrase1 = first_document.split(" ")
 				tokenized_phrase2 = tokens.split(" ")
 				
-			# tokenized_phrase1 = "Hay una abeja Hay una flor La abeja hace miel La miel es cara".split(" ")
-			# tokenized_phrase2 = "La abeja va hasta flor para hacer miel que se vende cara en el mercado".split(" ")
-			# first_sentence_list = ["Hay una abeja","Hay una flor","La abeja hace miel","La miel es cara"]
-			# sentence_list = ["La abeja va hasta flor para hacer miel que se vende cara en el mercado"]			
+			#tokenized_phrase1 = "Hay una abeja Hay una flor La abeja hace miel La miel es cara".split(" ")
+			#tokenized_phrase2 = "La abeja va hasta flor para hacer miel que se vende cara en el mercado".split(" ")
+			#first_sentence_list = ["Hay una abeja","Hay una flor","La abeja hace miel","La miel es cara"]
+			#sentence_list = ["La abeja va hasta flor para hacer miel que se vende cara en el mercado"]			
 			result_lcs=lcs(tokenized_phrase1, tokenized_phrase2, " ").split(" ")
 			count=0				
 			while count == 0:
@@ -117,12 +142,32 @@ for cluster in cluster_ids:
 						contains_words1=lcs(result_lcs,first_sentence_list[count].split(" ")," ").split(" ")
 						if '' in contains_words1:
 							contains_words1.remove('')
+						#import ipdb;ipdb.set_trace()
+						# if contains_words1:	
+						# 	tfidf=TfidfVectorizer(vocabulary=sorted(set(contains_words1)),ngram_range=(1,2))
+						# 	tfs=tfidf.fit_transform(first_sentence_list[count].split(" "))
+						# 	rows, cols = tfs.nonzero()
+						# 	for row, col in zip(rows, cols):
+						# 		score_doc1=score_doc1+tfs[row,col]
+						# else:
+						# 	score_doc1=0	
+
 						score_doc1=len(contains_words1)/len(first_sentence_list[count].split(" "))	
+						#import ipdb;ipdb.set_trace()
 					if sentence_list:
 						contains_words3=lcs(result_lcs,sentence_list[count].split(" "), " ").split(" ")	
-						if '' in contains_words3:
-							contains_words3.remove('')		
+						# if '' in contains_words3:
+						# 	contains_words3.remove('')
+						# if contains_words3:	
+						# 	tfidf=TfidfVectorizer(vocabulary=sorted(set(contains_words3)),ngram_range=(1,2))
+						# 	tfs=tfidf.fit_transform(sentence_list[count].split(" "))
+						# 	rows, cols = tfs.nonzero()
+						# 	for row, col in zip(rows, cols):
+						# 		score_doc2=score_doc2+tfs[row,col]
+						# else:
+						# 	score_doc2=0					
 						score_doc2=len(contains_words3)/len(sentence_list[count].split(" "))
+						#import ipdb;ipdb.set_trace()
 					if score_doc1 > score_doc2:											
 						for elem in contains_words1:
 							if elem in result_lcs:	
@@ -194,7 +239,7 @@ for cluster in cluster_ids:
 			count_printf+=1	
 			if count_printf==9:
 				for_printf=""
-				for_printf=" ".join(summary_wordlimit(resume_printf,summary_sentence_scores,15))
+				for_printf=" ".join(summary_wordlimit(resume_printf,summary_sentence_scores,100))
 				print("\n\n\nResumen de "+ cluster +": " +for_printf)
 				count_printf=0	
 			first_sentence_list=[]
